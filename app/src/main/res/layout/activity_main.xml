@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/symptom"
+        android:layout_width="148dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="25dp"
+        android:foregroundGravity="center"
+        android:text="SYMPTOMS"
+        app:layout_constraintBottom_toTopOf="@+id/upload_sign"
+        app:layout_constraintEnd_toEndOf="@+id/upload_sign"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_conversion_absoluteWidth="118dp" />
+
+    <Button
+        android:id="@+id/upload_sign"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="9dp"
+        android:layout_marginBottom="31dp"
+        android:foregroundGravity="center"
+        android:text="UPLOAD SIGNS"
+        app:layout_constraintBottom_toTopOf="@+id/imageView"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/symptom"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_conversion_absoluteWidth="143dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="153dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/cam"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/upload_sign"
+        app:srcCompat="@drawable/ic_launcher_foreground" />
+
+    <Button
+        android:id="@+id/cam"
+        android:layout_width="174dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="41dp"
+        android:text="Open Camera"
+        app:layout_constraintBottom_toTopOf="@+id/heart_rate"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintHorizontal_bias="0.076"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <Button
+        android:id="@+id/heart_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="21dp"
+        android:enabled="false"
+        android:foregroundGravity="center"
+        android:text="MEASURE HEART RATE"
+        app:layout_constraintBottom_toTopOf="@+id/tfhr"
+        app:layout_constraintStart_toStartOf="@+id/tfhr"
+        app:layout_constraintTop_toBottomOf="@+id/cam"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_conversion_absoluteWidth="202dp" />
+
+    <TextView
+        android:id="@+id/tfhr"
+        android:layout_width="118dp"
+        android:layout_height="28dp"
+        android:layout_marginBottom="29dp"
+        android:text="HR :"
+        app:layout_constraintBottom_toTopOf="@+id/respiration_rate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/heart_rate"
+        tools:layout_conversion_absoluteHeight="19dp"
+        tools:layout_conversion_absoluteWidth="26dp" />
+
+    <Button
+        android:id="@+id/respiration_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:foregroundGravity="center"
+        android:text="MEASURE RESPIRATION RATE"
+        app:layout_constraintBottom_toTopOf="@+id/tfrr"
+        app:layout_constraintStart_toStartOf="@+id/tfhr"
+        app:layout_constraintTop_toBottomOf="@+id/tfhr"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_conversion_absoluteWidth="252dp" />
+
+    <TextView
+        android:id="@+id/tfrr"
+        android:layout_width="388dp"
+        android:layout_height="29dp"
+        android:layout_marginBottom="139dp"
+        android:text="Respiration rate : "
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/respiration_rate"
+        app:layout_constraintTop_toBottomOf="@+id/respiration_rate"
+        tools:layout_conversion_absoluteHeight="19dp"
+        tools:layout_conversion_absoluteWidth="109dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
