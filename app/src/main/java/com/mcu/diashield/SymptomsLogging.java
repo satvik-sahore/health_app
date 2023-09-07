@@ -76,10 +76,10 @@ public class SymptomsLogging extends AppCompatActivity {
                 long rowId = db.insert("symptoms_ratings", null, values);
                 if (rowId != -1) {
                     // Insert successful
-                    Toast.makeText(SymptomsLogging.this, "Symptoms and ratings inserted.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SymptomsLogging.this, "Symptoms and ratings saved successfully.", Toast.LENGTH_SHORT).show();
                 } else {
                     // Insert failed
-                    Toast.makeText(SymptomsLogging.this, "Failed to insert symptoms and ratings.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SymptomsLogging.this, "Failed to save symptoms and ratings.", Toast.LENGTH_SHORT).show();
                 }
 
                 // Close the database

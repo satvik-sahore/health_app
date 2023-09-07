@@ -30,19 +30,19 @@ import java.util.List;
 import android.Manifest;
 import android.os.Build;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
-    Button symptom_u, signs_u, heartrate, respiration,cam, uploadSigns;
+    Button symptom_u, heartrate, respiration, uploadSigns;
     private int i = 0;
-    TextView heartRateTextView, respiratoryRateTextView, signsMessage;
+    TextView heartRateTextView, respiratoryRateTextView;
     private float[] accelValuesX, accelValuesY, accelValuesZ;
     private static final int PERMISSION_SENSORS_REQUEST_CODE = 1;
     private static final int PERMISSION_STORAGE_REQUEST_CODE = 2;
-    ImageView imageView;
     private Uri videoUri;
     private static final int VIDEO_CAPTURE = 101;
     float[] rating;
@@ -165,10 +165,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         heartRateTextView = findViewById(R.id.tfhr);
         respiratoryRateTextView = findViewById(R.id.tfrr);
         respiration = findViewById(R.id.respiration_rate);
-        imageView= findViewById(R.id.imageView);
-        cam = findViewById(R.id.cam);
         uploadSigns = findViewById(R.id.sign_btn);
-        signsMessage = findViewById(R.id.tfsigns);
         load_rating();
     }
 
@@ -362,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Insert both values into the database
         dbHelper.insertHeartRate(heartRateValue);
         dbHelper.insertRespiratoryRate(respiratoryRate);
-        signsMessage.setText("Signs data saved successfully.");
+        Toast.makeText(this, "Signs saved successfully.", Toast.LENGTH_SHORT).show();
     }
 
 
