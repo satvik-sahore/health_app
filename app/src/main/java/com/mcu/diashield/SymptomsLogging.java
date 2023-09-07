@@ -2,7 +2,9 @@ package com.mcu.diashield;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class SymptomsLogging extends AppCompatActivity {
+    Database dbHelper = new Database(this);
     Button sym_u2;
     RatingBar ratingBar;
     Spinner symptom_list;
@@ -29,15 +32,32 @@ public class SymptomsLogging extends AppCompatActivity {
         sym_u2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /* two tasks
-                2. Get back to main page after giving confirmation of database entry
-                 */
+                // Insert symptoms and ratings into the database
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                //2.  Get back to main page after giving confirmation of database entry
-                Toast.makeText(SymptomsLogging.this, "Succesfull datase Entry", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                Output.message(getApplicationContext(),""+rating[0]+" size = "+rating.length);
-                intent.putExtra("rating_r",rating);
+                for (int i = 0; i < symps.size(); i++) {
+                    String symptom = symps.get(i);
+                    float symptomRating = rating[i];
+
+                    ContentValues values = new ContentValues();
+                    values.put("symptom", symptom);
+                    values.put("rating", symptomRating);
+
+                    long rowId = db.insert("symptoms_ratings", null, values);
+                    if (rowId != -1) {
+                        // Insert successful
+                        Toast.makeText(SymptomsLogging.this, "Symptom inserted: " + symptom, Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Insert failed
+                        Toast.makeText(SymptomsLogging.this, "Failed to insert symptom: " + symptom, Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                // Close the database
+                db.close();
+
+                // Navigate back to the main activity or perform any other desired action
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
         });
@@ -64,7 +84,7 @@ public class SymptomsLogging extends AppCompatActivity {
         symptom_list = findViewById(R.id.symptoms_list);
         if(rating == null)
             rating = getIntent().getExtras().getFloatArray("rating");
-        Log.d("sarthak","in 2nd page");
+        Log.d("satvik","in 2nd page");
         load_spinner();
     }
 
@@ -86,14 +106,9 @@ public class SymptomsLogging extends AppCompatActivity {
             symps.add("Feeling Tired");
         }
 
-
-
         c =new CustomAdaptor(symps,getApplicationContext(),rating);
         rating = c.getRating();
         Output.message(getApplicationContext(),""+rating[0]);
         symptom_list.setAdapter(c);
     }
-
-
-
 }

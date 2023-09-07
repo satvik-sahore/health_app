@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
@@ -36,17 +35,10 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.widget.TextView;
-
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
-    Button symptom_u, signs_u, heartrate, respiration,cam;
+    Button symptom_u, signs_u, heartrate, respiration,cam, uploadSigns;
     private int i = 0;
-    TextView heartRateTextView, respiratoryRateTextView;
+    TextView heartRateTextView, respiratoryRateTextView, signsMessage;
     private float[] accelValuesX, accelValuesY, accelValuesZ;
     private static final int PERMISSION_SENSORS_REQUEST_CODE = 1;
     private static final int PERMISSION_STORAGE_REQUEST_CODE = 2;
@@ -63,13 +55,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private List<Float> accelerometerValuesZ = new ArrayList<>();
     private long startTimeMillis;
     private boolean isRecording = false;
-
+    Database dbHelper = new Database(MainActivity.this);
     private ActivityResultLauncher<Intent> videoCaptureLauncher;
     private static final int pic_id = 123;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dbHelper = new Database(this);
 
         // Check for and request the SENSOR permission if needed
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -147,13 +141,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        signs_u.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
         respiration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -162,17 +149,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
+        uploadSigns.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Call a method to insert both heart rate and respiratory rate
+                insertHeartAndRespiratoryRates();
+            }
+        });
+
     }
     private void initialize_views()
     {
         symptom_u = findViewById(R.id.symptom);
-        signs_u = findViewById(R.id.upload_sign);
-        heartrate = findViewById(R.id.heart_rate);
+        heartrate = findViewById(R.id.heartratebtn);
         heartRateTextView = findViewById(R.id.tfhr);
         respiratoryRateTextView = findViewById(R.id.tfrr);
         respiration = findViewById(R.id.respiration_rate);
         imageView= findViewById(R.id.imageView);
         cam = findViewById(R.id.cam);
+        uploadSigns = findViewById(R.id.sign_btn);
+        signsMessage = findViewById(R.id.tfsigns);
         load_rating();
     }
 
@@ -301,12 +297,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
             // Update the TextView's text with the heart rate result
             heartRateTextView.setText("Heart Rate: " + result);
         }
     }
-
 
     private float calculate_h_rate()
     {
@@ -345,14 +339,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             // Stop recording
             isRecording = false;
             sensorManager.unregisterListener(this);
-
             // Calculate average respiratory rate
             int averageRespiratoryRate = callRespiratoryCalculator();
-
             // Display the average respiratory rate
-            respiratoryRateTextView.setText("Average Respiratory Rate: " + averageRespiratoryRate + " breaths per minute");
+            respiratoryRateTextView.setText("Respiratory Rate: " + averageRespiratoryRate + " breaths per minute");
         }
     }
+
+    private void insertHeartAndRespiratoryRates() {
+        // Get heart rate value (you may need to adapt this part based on where your heart rate value is stored)
+        int heartRateValue = 0;
+        String heartRateResult = heartRateTextView.getText().toString();
+        String[] parts = heartRateResult.split(":");
+        if (parts.length == 2) {
+            String numericPart = parts[1].trim(); // Get the numeric part
+            heartRateValue = Integer.parseInt(numericPart);
+            // Now you can use heartRateValue as an integer
+        } else {
+        }
+        // Calculate average respiratory rate
+        int respiratoryRate = callRespiratoryCalculator();
+        // Insert both values into the database
+        dbHelper.insertHeartRate(heartRateValue);
+        dbHelper.insertRespiratoryRate(respiratoryRate);
+        signsMessage.setText("Signs data saved successfully.");
+    }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
