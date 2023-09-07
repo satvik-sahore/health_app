@@ -108,7 +108,7 @@ public class SymptomsLogging extends AppCompatActivity {
 
         c =new CustomAdaptor(symps,getApplicationContext(),rating);
         rating = c.getRating();
-        Output.message(getApplicationContext(),""+rating[0]);
+        //Output.message(getApplicationContext(),""+rating[0]);
         symptom_list.setAdapter(c);
     }
 }
