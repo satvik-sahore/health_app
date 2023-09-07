@@ -14,9 +14,18 @@ public class Database extends SQLiteOpenHelper {
     private static final String TABLE_RESPIRATORY_RATE = "respiratory_rate";
     private static final String TABLE_SYMPTOMS_RATINGS = "symptoms_ratings";
     private static final String COLUMN_ID = "id";
+    private static final String COLUMN_TIMESTAMP = "timestamp";
     private static final String COLUMN_VALUE = "value";
-    private static final String COLUMN_SYMPTOM = "symptom";
-    private static final String COLUMN_RATING = "rating";
+    private static final String COLUMN_SYMPTOM_NAUSEA = "nausea";
+    private static final String COLUMN_SYMPTOM_HEADACHE = "headache";
+    private static final String COLUMN_SYMPTOM_DIARRHEA = "diarrhea";
+    private static final String COLUMN_SYMPTOM_SORE_THROAT = "sore_throat";
+    private static final String COLUMN_SYMPTOM_FEVER = "fever";
+    private static final String COLUMN_SYMPTOM_MUSCLE_ACHE = "muscle_ache";
+    private static final String COLUMN_SYMPTOM_LOSS_OF_SMELL_OR_TASTE = "loss_of_smell_or_taste";
+    private static final String COLUMN_SYMPTOM_COUGH = "cough";
+    private static final String COLUMN_SYMPTOM_SHORTNESS_OF_BREATH = "shortness_of_breath";
+    private static final String COLUMN_SYMPTOM_FEELING_TIRED = "feeling_tired";
 
     // Constructor
     public Database(Context context) {
@@ -28,16 +37,27 @@ public class Database extends SQLiteOpenHelper {
         // Create tables
         String createHeartRateTable = "CREATE TABLE " + TABLE_HEART_RATE + " ("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
                 + COLUMN_VALUE + " INTEGER)";
 
         String createRespiratoryRateTable = "CREATE TABLE " + TABLE_RESPIRATORY_RATE + " ("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
                 + COLUMN_VALUE + " INTEGER)";
 
         String createSymptomsTable = "CREATE TABLE " + TABLE_SYMPTOMS_RATINGS + " ("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COLUMN_SYMPTOM + " TEXT, "
-                + COLUMN_RATING + " REAL)";
+                + COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                + COLUMN_SYMPTOM_NAUSEA + " REAL, "
+                + COLUMN_SYMPTOM_HEADACHE + " REAL, "
+                + COLUMN_SYMPTOM_DIARRHEA + " REAL, "
+                + COLUMN_SYMPTOM_SORE_THROAT + " REAL, "
+                + COLUMN_SYMPTOM_FEVER + " REAL, "
+                + COLUMN_SYMPTOM_MUSCLE_ACHE + " REAL, "
+                + COLUMN_SYMPTOM_LOSS_OF_SMELL_OR_TASTE + " REAL, "
+                + COLUMN_SYMPTOM_COUGH + " REAL, "
+                + COLUMN_SYMPTOM_SHORTNESS_OF_BREATH + " REAL, "
+                + COLUMN_SYMPTOM_FEELING_TIRED + " REAL)";
 
         db.execSQL(createHeartRateTable);
         db.execSQL(createRespiratoryRateTable);

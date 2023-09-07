@@ -34,7 +34,7 @@ public class SymptomsLogging extends AppCompatActivity {
             public void onClick(View view) {
                 // Insert symptoms and ratings into the database
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
-
+                /*
                 for (int i = 0; i < symps.size(); i++) {
                     String symptom = symps.get(i);
                     float symptomRating = rating[i];
@@ -51,6 +51,35 @@ public class SymptomsLogging extends AppCompatActivity {
                         // Insert failed
                         Toast.makeText(SymptomsLogging.this, "Failed to insert symptom: " + symptom, Toast.LENGTH_SHORT).show();
                     }
+                }
+
+                // Close the database
+                db.close();
+
+                // Navigate back to the main activity or perform any other desired action
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });*/
+                ContentValues values = new ContentValues();
+                values.put("nausea", rating[0]);
+                values.put("headache", rating[1]);
+                values.put("diarrhea", rating[2]);
+                values.put("sore_throat", rating[3]);
+                values.put("fever", rating[4]);
+                values.put("muscle_ache", rating[5]);
+                values.put("loss_of_smell_or_taste", rating[6]);
+                values.put("cough", rating[7]);
+                values.put("shortness_of_breath", rating[8]);
+                values.put("feeling_tired", rating[9]);
+
+                long rowId = db.insert("symptoms_ratings", null, values);
+                if (rowId != -1) {
+                    // Insert successful
+                    Toast.makeText(SymptomsLogging.this, "Symptoms and ratings inserted.", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Insert failed
+                    Toast.makeText(SymptomsLogging.this, "Failed to insert symptoms and ratings.", Toast.LENGTH_SHORT).show();
                 }
 
                 // Close the database
