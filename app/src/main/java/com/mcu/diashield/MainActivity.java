@@ -3,6 +3,8 @@ import android.content.Context;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.SensorEventListener;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -21,8 +23,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.orange)));
 
         dbHelper = new Database(this);
 
@@ -280,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 int count = 0;
                 for (int i = 1; i < b.size(); i++) {
                     long p = b.get(i);
-                    if ((p - x) > 3500) {
+                    if ((p - x) > 100) {
                         count = count + 1;
                     }
                     x = b.get(i);
@@ -320,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
             }
 
-            // Stop recording after 45 minutes
+            // Stop recording after 45 seconds
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -390,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private int callRespiratoryCalculator() {
         int totalBreaths = 0;
-        int totalDurationInSeconds = 0;
+        int totalDurationInSeconds = 45;
         float previousValue = 0f;
         float currentValue = 0f;
 
@@ -401,15 +403,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             Math.pow(accelerometerValuesY.get(i), 2.0)
             );
 
-            if (Math.abs(previousValue - currentValue) > 0.15) {
+            if (Math.abs(previousValue - currentValue) > 0.52) {
                 totalBreaths++;
             }
 
             previousValue = currentValue;
         }
-
-        // Calculate the duration in seconds (45 minutes)
-        totalDurationInSeconds = 45 * 60;
 
         // Calculate the average respiratory rate in breaths per minute
         double averageRespiratoryRate = (double) totalBreaths / totalDurationInSeconds * 60;
