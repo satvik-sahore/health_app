@@ -9,7 +9,7 @@ public class Database extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "HealthData.db";
     private static final int DATABASE_VERSION = 1;
 
-    // Define your table and column names
+    // Table and column names
     private static final String TABLE_HEART_RATE = "heart_rate";
     private static final String TABLE_RESPIRATORY_RATE = "respiratory_rate";
     private static final String TABLE_SYMPTOMS_RATINGS = "symptoms_ratings";

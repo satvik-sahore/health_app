@@ -11,6 +11,9 @@ import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
 import android.app.Activity;
@@ -36,6 +39,38 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     Button symptom_u, heartrate, respiration, uploadSigns;
     private int i = 0;
@@ -53,6 +88,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private List<Float> accelerometerValuesX = new ArrayList<>();
     private List<Float> accelerometerValuesY = new ArrayList<>();
     private List<Float> accelerometerValuesZ = new ArrayList<>();
+    private CameraManager cameraManager;
+    private String cameraId;
+    private boolean isTorchOn = false;
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1001;
+    private boolean isFlashlightOn = false;
     private long startTimeMillis;
     private boolean isRecording = false;
     Database dbHelper = new Database(MainActivity.this);
@@ -65,7 +105,29 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.orange)));
 
+        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
         dbHelper = new Database(this);
+
+        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
+        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
+        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
+        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
+        try {
+            for (String id : cameraManager.getCameraIdList()) {
+                CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(id);
+                if (characteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
+                    cameraId = id;
+                    break;
+                }
+            }
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
 
         // Check for and request the SENSOR permission if needed
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -200,15 +262,38 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    private void toggleTorch() {
+        if (cameraManager == null) {
+            cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            try {
+                cameraId = cameraManager.getCameraIdList()[0]; // Use the first camera (rear camera)
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            cameraManager.setTorchMode(cameraId, !isTorchOn); // Toggle the torch
+            isTorchOn = !isTorchOn;
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startRecording() {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 45);
         videoCaptureLauncher.launch(intent);
+        toggleTorch();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (isTorchOn) {
+            toggleTorch(); // Turn off the torch when recording is stopped
+        }
 
         if (requestCode == VIDEO_CAPTURE && resultCode == RESULT_OK) {
             videoUri = data.getData();
@@ -299,13 +384,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             // Update the TextView's text with the heart rate result
             heartRateTextView.setText("Heart Rate: " + result);
         }
-    }
-
-    private float calculate_h_rate()
-    {
-        float h_rate=0.0f;
-
-        return h_rate;
     }
 
     private void startRecordingRespiration() {
