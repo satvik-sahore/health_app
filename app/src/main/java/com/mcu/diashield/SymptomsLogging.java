@@ -18,10 +18,10 @@ import java.util.ArrayList;
 
 public class SymptomsLogging extends AppCompatActivity {
     Database dbHelper = new Database(this);
-    Button sym_u2;
+    Button symptomUpload;
     RatingBar ratingBar;
-    Spinner symptom_list;
-    ArrayList<String> symps;
+    Spinner symptomList;
+    ArrayList<String> symptomArr;
     float[] rating;
     CustomAdaptor c;
     @Override
@@ -31,40 +31,14 @@ public class SymptomsLogging extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.orange)));
 
-        initialize_views();
+        initializeViews();
 
-        sym_u2.setOnClickListener(new View.OnClickListener() {
+        symptomUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Insert symptoms and ratings into the database
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
-                /*
-                for (int i = 0; i < symps.size(); i++) {
-                    String symptom = symps.get(i);
-                    float symptomRating = rating[i];
 
-                    ContentValues values = new ContentValues();
-                    values.put("symptom", symptom);
-                    values.put("rating", symptomRating);
-
-                    long rowId = db.insert("symptoms_ratings", null, values);
-                    if (rowId != -1) {
-                        // Insert successful
-                        Toast.makeText(SymptomsLogging.this, "Symptom inserted: " + symptom, Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Insert failed
-                        Toast.makeText(SymptomsLogging.this, "Failed to insert symptom: " + symptom, Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                // Close the database
-                db.close();
-
-                // Navigate back to the main activity or perform any other desired action
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-            }
-        });*/
                 ContentValues values = new ContentValues();
                 values.put("nausea", rating[0]);
                 values.put("headache", rating[1]);
@@ -99,49 +73,48 @@ public class SymptomsLogging extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        c = new CustomAdaptor(symps,getApplicationContext(),rating);
-        symptom_list.setAdapter(c);
+        c = new CustomAdaptor(symptomArr,getApplicationContext(),rating);
+        symptomList.setAdapter(c);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        c = new CustomAdaptor(symps,getApplicationContext(),rating);
-        symptom_list.setAdapter(c);
+        c = new CustomAdaptor(symptomArr,getApplicationContext(),rating);
+        symptomList.setAdapter(c);
     }
 
-    private void initialize_views()
+    private void initializeViews()
     {
-        sym_u2 = findViewById(R.id.upload_symptoms);
+        symptomUpload = findViewById(R.id.upload_symptoms);
         ratingBar = findViewById(R.id.ratingBar);
-        symptom_list = findViewById(R.id.symptoms_list);
+        symptomList = findViewById(R.id.symptoms_list);
         if(rating == null)
             rating = getIntent().getExtras().getFloatArray("rating");
         Log.d("satvik","in 2nd page");
-        load_spinner();
+        loadSpinner();
     }
 
-    private void load_spinner()
+    private void loadSpinner()
     {
 
-        //load the symptoms
-        if(symps == null) {
-            symps = new ArrayList<>();
-            symps.add("Nausea");
-            symps.add("Headache");
-            symps.add("Diarrhea");
-            symps.add("Soar Throat");
-            symps.add("Fever");
-            symps.add("Muscle Ache");
-            symps.add("Loss of smell or taste");
-            symps.add("Cough");
-            symps.add("Shortness of Breath");
-            symps.add("Feeling Tired");
+        // Load symptoms
+        if(symptomArr == null) {
+            symptomArr = new ArrayList<>();
+            symptomArr.add("Nausea");
+            symptomArr.add("Headache");
+            symptomArr.add("Diarrhea");
+            symptomArr.add("Soar Throat");
+            symptomArr.add("Fever");
+            symptomArr.add("Muscle Ache");
+            symptomArr.add("Loss of smell or taste");
+            symptomArr.add("Cough");
+            symptomArr.add("Shortness of Breath");
+            symptomArr.add("Feeling Tired");
         }
 
-        c =new CustomAdaptor(symps,getApplicationContext(),rating);
+        c =new CustomAdaptor(symptomArr,getApplicationContext(),rating);
         rating = c.getRating();
-        //Output.message(getApplicationContext(),""+rating[0]);
-        symptom_list.setAdapter(c);
+        symptomList.setAdapter(c);
     }
 }

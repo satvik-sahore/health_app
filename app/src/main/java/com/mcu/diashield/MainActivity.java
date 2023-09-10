@@ -3,7 +3,6 @@ import android.content.Context;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.SensorEventListener;
 import android.database.Cursor;
@@ -29,75 +28,33 @@ import android.widget.Button;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.Manifest;
 import android.os.Build;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
-    Button symptom_u, heartrate, respiration, uploadSigns;
-    private int i = 0;
+    Button symptomButton, heartRateButton, repirationRateButton, uploadSignsButton;
     TextView heartRateTextView, respiratoryRateTextView;
-    private float[] accelValuesX, accelValuesY, accelValuesZ;
     private static final int PERMISSION_SENSORS_REQUEST_CODE = 1;
     private static final int PERMISSION_STORAGE_REQUEST_CODE = 2;
     private Uri videoUri;
     private static final int VIDEO_CAPTURE = 101;
     float[] rating;
-    float h_rate,r_rate;
     private SensorManager sensorManager;
-    private Sensor accelerometerSensor;
-    private Button startRecordingButton;
-    private List<Float> accelerometerValuesX = new ArrayList<>();
-    private List<Float> accelerometerValuesY = new ArrayList<>();
-    private List<Float> accelerometerValuesZ = new ArrayList<>();
-    private CameraManager cameraManager;
-    private String cameraId;
+    private Sensor accSensor;
+    private List<Float> accValX = new ArrayList<>();
+    private List<Float> accValY = new ArrayList<>();
+    private List<Float> accValZ = new ArrayList<>();
+    private CameraManager camManager;
+    private String camId;
     private boolean isTorchOn = false;
-    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1001;
-    private boolean isFlashlightOn = false;
-    private long startTimeMillis;
     private boolean isRecording = false;
     Database dbHelper = new Database(MainActivity.this);
     private ActivityResultLauncher<Intent> videoCaptureLauncher;
-    private static final int pic_id = 123;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,23 +62,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.orange)));
 
-        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         dbHelper = new Database(this);
 
-        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
-        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
-        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
-        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         try {
-            for (String id : cameraManager.getCameraIdList()) {
-                CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(id);
+            for (String id : camManager.getCameraIdList()) {
+                CameraCharacteristics characteristics = camManager.getCameraCharacteristics(id);
                 if (characteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
-                    cameraId = id;
+                    camId = id;
                     break;
                 }
             }
@@ -154,15 +111,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         // Initialize Accelerometer Sensor
         if (sensorManager != null) {
-            accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
 
         // Register the sensor listener
-        if (accelerometerSensor != null) {
-            sensorManager.registerListener(MainActivity.this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        if (accSensor != null) {
+            sensorManager.registerListener(MainActivity.this, accSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
-        initialize_views();
+        initializeViews();
 
         videoCaptureLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -178,8 +135,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
         );
 
-        //for Symptoms update
-        symptom_u.setOnClickListener(new View.OnClickListener() {
+        // For Symptoms update
+        symptomButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(),SymptomsLogging.class);
@@ -188,24 +145,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        //for HeartRate
+        // For HeartRate
         if(!hasCamera()){
-            heartrate.setEnabled(false);
+            heartRateButton.setEnabled(false);
         }
         else
         {
-            heartrate.setEnabled(true);
+            heartRateButton.setEnabled(true);
         }
-        heartrate.setOnClickListener(new View.OnClickListener() {
+        heartRateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 heartRateTextView.setText("Calculating...");
-                startRecording();
+                startRecordingHeartRate();
                 //h_rate = calculate_h_rate();
             }
         });
 
-        respiration.setOnClickListener(new View.OnClickListener() {
+        repirationRateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 respiratoryRateTextView.setText("Calculating...");
@@ -213,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        uploadSigns.setOnClickListener(new View.OnClickListener() {
+        uploadSignsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Call a method to insert both heart rate and respiratory rate
@@ -222,18 +179,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
 
     }
-    private void initialize_views()
+    private void initializeViews()
     {
-        symptom_u = findViewById(R.id.symptom);
-        heartrate = findViewById(R.id.heartratebtn);
+        symptomButton = findViewById(R.id.symptom);
+        heartRateButton = findViewById(R.id.heartratebtn);
         heartRateTextView = findViewById(R.id.tfhr);
         respiratoryRateTextView = findViewById(R.id.tfrr);
-        respiration = findViewById(R.id.respiration_rate);
-        uploadSigns = findViewById(R.id.sign_btn);
-        load_rating();
+        repirationRateButton = findViewById(R.id.respiration_rate);
+        uploadSignsButton = findViewById(R.id.sign_btn);
+        loadRating();
     }
 
-    private void load_rating()
+    private void loadRating()
     {
         //load the rating
         if (rating == null) {
@@ -251,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-
     //HeartRate related functions and data
     private boolean hasCamera() {
         if (getPackageManager().hasSystemFeature(
@@ -263,24 +219,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void toggleTorch() {
-        if (cameraManager == null) {
-            cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        if (camManager == null) {
+            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
             try {
-                cameraId = cameraManager.getCameraIdList()[0]; // Use the first camera (rear camera)
+                camId = camManager.getCameraIdList()[0]; // Use the first camera (rear camera)
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
         }
 
         try {
-            cameraManager.setTorchMode(cameraId, !isTorchOn); // Toggle the torch
+            camManager.setTorchMode(camId, !isTorchOn); // Toggle the torch
             isTorchOn = !isTorchOn;
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
 
-    public void startRecording() {
+    public void startRecordingHeartRate() {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 45);
         videoCaptureLauncher.launch(intent);
@@ -305,12 +261,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public String convertMediaUriToPath(Uri uri) {
-        String path = null;
         String[] proj = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
-        path = cursor.getString(column_index);
+        String path = cursor.getString(column_index);
         cursor.close();
         return path;
     }
@@ -319,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         @Override
         protected String doInBackground(String... params) {
-            Bitmap m_bitmap = null;
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
             ArrayList<Bitmap> frameList = new ArrayList<>();
 
@@ -341,16 +295,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                long redBucket = 0;
-                long pixelCount = 0;
                 ArrayList<Long> a = new ArrayList<>();
 
                 for (Bitmap i : frameList) {
-                    redBucket = 0;
+                    long redBucket = 0;
                     for (int y = 550; y < 650; y++) {
                         for (int x = 550; x < 650; x++) {
                             int c = i.getPixel(x, y);
-                            pixelCount++;
                             redBucket += Color.red(c) + Color.blue(c) + Color.green(c);
                         }
                     }
@@ -389,15 +340,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private void startRecordingRespiration() {
         if (!isRecording) {
             // Start recording data
-            accelerometerValuesX.clear();
-            accelerometerValuesY.clear();
-            accelerometerValuesZ.clear();
-            startTimeMillis = System.currentTimeMillis();
+            accValX.clear();
+            accValY.clear();
+            accValZ.clear();
             isRecording = true;
 
             // Register the sensor listener
-            if (sensorManager != null && accelerometerSensor != null) {
-                sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            if (sensorManager != null && accSensor != null) {
+                sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_NORMAL);
             }
 
             // Stop recording after 45 seconds
@@ -417,9 +367,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             isRecording = false;
             sensorManager.unregisterListener(this);
             // Calculate average respiratory rate
-            int averageRespiratoryRate = callRespiratoryCalculator();
+            int avgRespiratoryRate = RespiratoryCalculator();
             // Display the average respiratory rate
-            respiratoryRateTextView.setText("Respiratory Rate: " + averageRespiratoryRate + " breaths per minute");
+            respiratoryRateTextView.setText("Respiratory Rate: " + avgRespiratoryRate + " breaths per minute");
         }
     }
 
@@ -435,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } else {
         }
         // Calculate average respiratory rate
-        int respiratoryRate = callRespiratoryCalculator();
+        int respiratoryRate = RespiratoryCalculator();
         // Insert both values into the database
         dbHelper.insertHeartRate(heartRateValue);
         dbHelper.insertRespiratoryRate(respiratoryRate);
@@ -453,9 +403,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Record accelerometer data while recording is active
         if (isRecording) {
             float[] values = event.values;
-            accelerometerValuesX.add(values[0]);
-            accelerometerValuesY.add(values[1]);
-            accelerometerValuesZ.add(values[2]);
+            accValX.add(values[0]);
+            accValY.add(values[1]);
+            accValZ.add(values[2]);
         }
     }
 
@@ -468,17 +418,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private int callRespiratoryCalculator() {
+    private int RespiratoryCalculator() {
         int totalBreaths = 0;
-        int totalDurationInSeconds = 45;
+        int durationInSeconds = 45;
         float previousValue = 0f;
         float currentValue = 0f;
 
-        for (int i = 1; i < accelerometerValuesX.size(); i++) {
+        for (int i = 1; i < accValX.size(); i++) {
             currentValue = (float) Math.sqrt(
-                    Math.pow(accelerometerValuesZ.get(i), 2.0) +
-                            Math.pow(accelerometerValuesX.get(i), 2.0) +
-                            Math.pow(accelerometerValuesY.get(i), 2.0)
+                    Math.pow(accValZ.get(i), 2.0) +
+                            Math.pow(accValX.get(i), 2.0) +
+                            Math.pow(accValY.get(i), 2.0)
             );
 
             if (Math.abs(previousValue - currentValue) > 0.52) {
@@ -489,9 +439,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         // Calculate the average respiratory rate in breaths per minute
-        double averageRespiratoryRate = (double) totalBreaths / totalDurationInSeconds * 60;
+        double avgRespiratoryRate = (double) totalBreaths / durationInSeconds * 60;
 
-        return (int) averageRespiratoryRate;
+        return (int) avgRespiratoryRate;
     }
 
     // Handle the result of permission requests

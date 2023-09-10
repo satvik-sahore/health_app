@@ -58,7 +58,6 @@ public class CustomAdaptor extends BaseAdapter {
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
                 rating[i] = v;
                 ratingBar.setRating(v);
-                //Output.message(context,"rating "+rating[i]);
             }
         });
 
